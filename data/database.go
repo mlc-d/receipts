@@ -1,7 +1,7 @@
 package data
 
 import (
-	"recibosV2/error"
+	"recibosV2/errorh"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -9,10 +9,11 @@ import (
 
 var (
 	// SqlDb sql.DB
-	GormDb gorm.DB
+	Gdb *gorm.DB
 )
 
-func init() {
-	GormDb, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	error.Handle(err)
+func Connect() {
+	var err error
+	Gdb, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	errorh.Handle(err)
 }

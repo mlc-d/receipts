@@ -14,29 +14,29 @@ type Service struct {
 }
 
 func CreateService(s Service) {
-	db := data.GormDb
+	db := data.Gdb
 	result := db.Create(&s)
 	errorh.Handle(result.Error)
 }
 
 func GetService(s Service) (service Service) {
-	db := data.GormDb
+	db := data.Gdb
 	db.Where("name = ?", s.Name).Find(&service)
 	return
 }
 
 func GetServices() (services []Service) {
-	db := data.GormDb
+	db := data.Gdb
 	db.Find(&services)
 	return
 }
 
 func UpdateService(s Service) {
-	db := data.GormDb
+	db := data.Gdb
 	db.Model(&s).Updates(s)
 }
 
 func DeleteService(s Service) {
-	db := data.GormDb
+	db := data.Gdb
 	db.Delete(&s)
 }

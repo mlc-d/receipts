@@ -14,29 +14,29 @@ type Person struct {
 }
 
 func CreatePerson(p Person) {
-	db := data.GormDb
+	db := data.Gdb
 	result := db.Create(&p)
 	errorh.Handle(result.Error)
 }
 
 func GetPerson(p Person) (person Person) {
-	db := data.GormDb
+	db := data.Gdb
 	db.Where("name = ?", p.Name).Find(&person)
 	return
 }
 
 func GetPersons() (persons []Person) {
-	db := data.GormDb
+	db := data.Gdb
 	db.Find(&persons)
 	return
 }
 
 func UpdatePerson(p Person) {
-	db := data.GormDb
+	db := data.Gdb
 	db.Model(&p).Updates(p)
 }
 
 func DeletePerson(p Person) {
-	db := data.GormDb
+	db := data.Gdb
 	db.Delete(&p)
 }
