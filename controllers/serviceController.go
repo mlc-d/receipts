@@ -19,6 +19,7 @@ func ServiceController(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(payload)
+		return
 	case "POST":
 		err = json.NewDecoder(r.Body).Decode(&service)
 		if err != nil {
@@ -28,6 +29,7 @@ func ServiceController(w http.ResponseWriter, r *http.Request) {
 		models.CreateService(*service)
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte("201 - created"))
+		return
 	case "PATCH":
 		err = json.NewDecoder(r.Body).Decode(&service)
 		if err != nil {
@@ -37,6 +39,7 @@ func ServiceController(w http.ResponseWriter, r *http.Request) {
 		models.UpdateService(*service)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("200 - ok"))
+		return
 	case "DELETE":
 		err = json.NewDecoder(r.Body).Decode(&service)
 		if err != nil {
@@ -46,5 +49,6 @@ func ServiceController(w http.ResponseWriter, r *http.Request) {
 		models.DeleteService(*service)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("200 - ok"))
+		return
 	}
 }
