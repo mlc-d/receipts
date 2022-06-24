@@ -7,4 +7,5 @@
 ## Installation
     git clone https://github.com/mlc-d/receipts.git
     cd receipts
+    go mod tidy
     go build main.go
