@@ -9,53 +9,78 @@ import (
 	"recibosV2/utils"
 )
 
-func PaymentController(w http.ResponseWriter, r *http.Request) {
-	payment := new(models.Payment)
+func PaymentGetController(w http.ResponseWriter, r *http.Request) {
 	var payments []models.Payment
 	var err error
+	payments = models.GetPayments()
+	payload, err := json.Marshal(payments)
+	errorh.Handle(err)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(payload)
+	return
+}
+
+func PaymentPostController(w http.ResponseWriter, r *http.Request) {
+	var err error
+	payment := new(models.Payment)
+	var payments []models.Payment
+	err = json.NewDecoder(r.Body).Decode(&payment)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	receipt := models.GetReceipt(models.Receipt{Id: payment.ReceiptID})
+	payments = calculatePayment(receipt)
+	for _, v := range payments {
+		models.CreatePayment(v)
+	}
+	w.WriteHeader(http.StatusCreated)
+	_, err = w.Write([]byte("201 - created"))
+	return
+}
+
+func PaymentPatchController(w http.ResponseWriter, r *http.Request) {
+	payment := new(models.Payment)
+	var err error
+	err = json.NewDecoder(r.Body).Decode(&payment)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	models.UpdatePayment(*payment)
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte("200 - ok"))
+	return
+}
+
+func PaymentDeleteController(w http.ResponseWriter, r *http.Request) {
+	var err error
+	payment := new(models.Payment)
+	err = json.NewDecoder(r.Body).Decode(&payment)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	models.DeletePayment(*payment)
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte("200 - ok"))
+	return
+}
+
+func PaymentController(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		payments = models.GetPayments()
-		payload, err := json.Marshal(payments)
-		errorh.Handle(err)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(payload)
-		return
+		PaymentGetController(w, r)
 	case "POST":
-		err = json.NewDecoder(r.Body).Decode(&payment)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		receipt := models.GetReceipt(models.Receipt{Id: payment.ReceiptID})
-		payments = calculatePayment(receipt)
-		for _, v := range payments {
-			models.CreatePayment(v)
-		}
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("201 - created"))
-		return
+		PaymentPostController(w, r)
 	case "PATCH":
-		err = json.NewDecoder(r.Body).Decode(&payment)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		models.UpdatePayment(*payment)
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("200 - ok"))
-		return
+		PaymentPatchController(w, r)
 	case "DELETE":
-		err = json.NewDecoder(r.Body).Decode(&payment)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		models.DeletePayment(*payment)
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("200 - ok"))
-		return
+		PaymentDeleteController(w, r)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		_, _ = w.Write([]byte("405 - Method Not Allowed"))
 	}
 }
 
